@@ -30,6 +30,12 @@ def load_and_scale_image(image,size_w,size_h):
     sprite=pygame.image.load(image)
     return pygame.transform.scale(sprite,(size_w,size_h)).convert_alpha()
 
+def load_and_scale_image_alpha(image,size_w,size_h,alpha):
+    sprite=pygame.image.load(image)
+    sprite=pygame.transform.scale(sprite,(size_w,size_h)).convert_alpha()
+    sprite.set_alpha(alpha)
+    return sprite
+
 def load_and_set_volume_sound(sound,volume):
     sound=pygame.mixer.Sound(sound)
     sound.set_volume(volume)
@@ -147,7 +153,7 @@ class Input():
         self.rect_work=arg
 
 class Button():
-    def __init__(self,x,y,text,size,size_font,Smoothing_text,color_text,color,hover_color,color_press,func,args=None):
+    def __init__(self,x,y,text,size,size_font,Smoothing_text,color_text,color,hover_color,color_press,func=None,args=None):
         """
             Args:
             x (int): Кординаты по оси x
@@ -191,13 +197,14 @@ class Button():
             self.Surface.fill(self.hover_color)
             if mouse[0]:
                 self.Surface.fill(self.press_color)
-                if not self.args==None:
-                    if isinstance(self.args, (tuple, list)):
-                        self.func(*self.args) 
+                if self.func!=None:
+                    if not self.args==None:
+                        if isinstance(self.args, (tuple, list)):
+                            self.func(*self.args) 
+                        else:
+                            self.func(self.args)
                     else:
-                        self.func(self.args)
-                else:
-                    self.func()
+                        self.func()
                 self.click=False
         else:
             self.Surface.fill(self.color)
@@ -213,8 +220,10 @@ class Button():
         self.text=str(text_str)
     def change_color(self,color):
         self.color=color
-    def change__text_color(self,color):
+    def change_text_color(self,color):
         self.color_text=color
+    def change_size(self,size):
+        self.Surface=pygame.Surface((size[0],size[1]))
     def rect(self,arg):
         self.rect_work=arg
 
@@ -367,18 +376,3 @@ class Video():
     
     def change_loop(self, loop):
         self.loop = loop
-
-class Animation_Data():
-    def __init__(self,image_path,size_w,size_h):
-        self.image_path=image_path
-        self.animations_list=[]
-        self.status_animation={}
-        self.status_animation_base=""
-        self.size_w=size_w
-        self.size_h=size_h
-        for index,image in enumerate(self.image_path):
-            self.animations_list.append([])
-            animations_load(image,self.animations_list[index],self.size_w,self.size_h)
-    def Set_status(self,animation_status,animation_base_status):
-        self.status_animation=animation_status
-        self.status_animation_base=animation_base_status
